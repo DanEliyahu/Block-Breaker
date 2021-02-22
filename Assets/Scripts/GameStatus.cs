@@ -8,11 +8,13 @@ public class GameStatus : MonoBehaviour
     [Range(0.1f, 10f)] [SerializeField] private float gameSpeed = 1f;
     [SerializeField] private int pointsPerBlock = 50;
     [SerializeField] private TextMeshProUGUI scoreText;
+    [SerializeField] private bool isAutoPlayEnabled;
 
     [SerializeField] private int currentScore = 0;
 
     private void Awake()
     {
+        // Singleton
         var gameStatusCount = FindObjectsOfType<GameStatus>().Length;
         if (gameStatusCount > 1)
         {
@@ -45,5 +47,10 @@ public class GameStatus : MonoBehaviour
     public void ResetGame()
     {
         Destroy(gameObject);
+    }
+
+    public bool IsAutoPlayEnabled()
+    {
+        return isAutoPlayEnabled;
     }
 }

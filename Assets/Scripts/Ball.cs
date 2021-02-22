@@ -9,25 +9,28 @@ public class Ball : MonoBehaviour
     [SerializeField] private float xPush = 2f;
     [SerializeField] private float yPush = 15f;
     [SerializeField] private AudioClip[] ballSounds;
+    [SerializeField] private float randomFactor = 0.2f;
 
     // state
-    private Vector2 _paddleToBallVector;
-    private bool _hasStarted = false;
-    
+    private Vector2 paddleToBallVector;
+    private bool hasStarted = false;
+
     // Cached component references
-    private AudioSource _myAudioSource; 
+    private AudioSource myAudioSource;
+    private Rigidbody2D myRigidbody2D;
 
     // Start is called before the first frame update
     void Start()
     {
-        _paddleToBallVector = transform.position - paddle1.transform.position;
-        _myAudioSource = GetComponent<AudioSource>();
+        paddleToBallVector = transform.position - paddle1.transform.position;
+        myAudioSource = GetComponent<AudioSource>();
+        myRigidbody2D = GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (_hasStarted) return;
+        if (hasStarted) return;
         LockBallToPaddle();
         LaunchOnMouseClick();
     }
@@ -36,8 +39,8 @@ public class Ball : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            GetComponent<Rigidbody2D>().velocity = new Vector2(xPush, yPush);
-            _hasStarted = true;
+            myRigidbody2D.velocity = new Vector2(xPush, yPush);
+            hasStarted = true;
         }
     }
 
@@ -45,15 +48,17 @@ public class Ball : MonoBehaviour
     {
         var position = paddle1.transform.position;
         var paddlePos = new Vector2(position.x, position.y);
-        transform.position = paddlePos + _paddleToBallVector;
+        transform.position = paddlePos + paddleToBallVector;
     }
 
     private void OnCollisionEnter2D(Collision2D other)
     {
-        if (_hasStarted)
+        var velocityTweak = new Vector2(Random.Range(0f, randomFactor), Random.Range(0f, randomFactor));
+        if (hasStarted)
         {
             var clip = ballSounds[Random.Range(0, ballSounds.Length)];
-            _myAudioSource.PlayOneShot(clip);
+            myAudioSource.PlayOneShot(clip);
+            myRigidbody2D.velocity += velocityTweak;
         }
     }
 }
